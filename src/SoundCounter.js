@@ -412,23 +412,44 @@ const SoundCounter = () => {
         </p>
         {isListening && (
           <div style={{marginTop: '15px'}}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
-              <span style={{color: 'white', minWidth: '100px'}}>Volume Level:</span>
+            <div style={{marginBottom: '15px'}}>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
+                <span style={{color: 'white', fontSize: '14px', fontWeight: '600'}}>Volume Level</span>
+                <span style={{color: 'white', fontSize: '12px', fontFamily: 'monospace', background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '6px'}}>{(currentVolume).toFixed(3)}</span>
+              </div>
               <div style={{
-                flex: 1,
-                height: '20px',
-                background: 'rgba(255,255,255,0.2)',
-                borderRadius: '10px',
-                overflow: 'hidden'
+                height: '12px',
+                background: 'rgba(255,255,255,0.15)',
+                borderRadius: '6px',
+                overflow: 'hidden',
+                position: 'relative',
+                border: '1px solid rgba(255,255,255,0.2)'
               }}>
                 <div style={{
                   height: '100%',
-                  width: `${Math.min(currentVolume * 100 / threshold, 100)}%`,
-                  background: currentVolume > threshold ? '#00b894' : '#74b9ff',
-                  transition: 'width 0.1s ease'
+                  width: `${Math.min(currentVolume * 300, 100)}%`,
+                  background: currentVolume > threshold 
+                    ? 'linear-gradient(90deg, #00b894, #00a085)' 
+                    : 'linear-gradient(90deg, #74b9ff, #0984e3)',
+                  transition: 'width 0.15s ease',
+                  borderRadius: '6px',
+                  boxShadow: currentVolume > threshold ? '0 0 8px rgba(0, 184, 148, 0.5)' : 'none'
+                }}></div>
+                <div style={{
+                  position: 'absolute',
+                  left: `${threshold * 300}%`,
+                  top: '0',
+                  width: '2px',
+                  height: '100%',
+                  background: '#ff6b6b',
+                  opacity: 0.8
                 }}></div>
               </div>
-              <span style={{color: 'white', minWidth: '60px'}}>{(currentVolume).toFixed(3)}</span>
+              <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '4px'}}>
+                <span style={{color: 'rgba(255,255,255,0.7)', fontSize: '10px'}}>Silent</span>
+                <span style={{color: '#ff6b6b', fontSize: '10px'}}>Threshold</span>
+                <span style={{color: 'rgba(255,255,255,0.7)', fontSize: '10px'}}>Loud</span>
+              </div>
             </div>
             <button
               className="button button-secondary"
