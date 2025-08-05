@@ -36,7 +36,7 @@ body {
 
 .header h1 {
   margin: 0;
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
   line-height: 1.2;
@@ -47,6 +47,58 @@ body {
   opacity: 0.9;
   font-size: 1rem;
   font-weight: 500;
+}
+
+.main-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.button-compact {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  min-height: 44px;
+  touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.button-compact:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.button-compact.button-primary {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.button-compact.button-secondary {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+  box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+}
+
+.button-compact.button-success {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
 }
 
 .controls {
@@ -350,11 +402,23 @@ body {
   }
   
   .header h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   
   .header p {
     font-size: 0.9rem;
+  }
+  
+  .main-controls {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  
+  .button-compact {
+    padding: 10px 6px;
+    font-size: 12px;
+    min-height: 40px;
+    border-radius: 10px;
   }
   
   .stats {
@@ -421,7 +485,18 @@ body {
   }
   
   .header h1 {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+  }
+  
+  .main-controls {
+    gap: 4px;
+  }
+  
+  .button-compact {
+    padding: 8px 4px;
+    font-size: 11px;
+    min-height: 38px;
+    letter-spacing: 0.2px;
   }
   
   .stats {
@@ -448,6 +523,10 @@ body {
 @media (hover: none) and (pointer: coarse) {
   .button {
     min-height: 56px;
+  }
+  
+  .button-compact {
+    min-height: 48px;
   }
   
   .input-group input {

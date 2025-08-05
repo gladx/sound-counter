@@ -405,6 +405,59 @@ const SoundCounter = () => {
         <p>Ping Pong Ball Hit Detector</p>
       </div>
       
+      {/* Main Action Buttons - Moved to Top */}
+      <div className="main-controls">
+        <button
+          className={`button-compact ${isListening ? 'button-secondary' : 'button-primary'}`}
+          onClick={isListening ? stopListening : startListening}
+        >
+          {isListening ? '⏹️ Stop' : '▶️ Start'}
+        </button>
+        
+        <button
+          className="button-compact button-success"
+          onClick={handleReset}
+        >
+          🔄 Reset
+        </button>
+        
+        <button
+          className="button-compact button-success"
+          onClick={() => {
+            // Manual hit for testing
+            setHits(prevHits => {
+              const newHits = prevHits + 1;
+              const newSteps = Math.floor(newHits / stepsPerHit);
+              
+              setSteps(prevSteps => {
+                if (newSteps > prevSteps) {
+                  playStepSound();
+                  setRecords(prev => ({
+                    ...prev,
+                    currentStreak: prev.currentStreak + 1,
+                    bestStreak: Math.max(prev.bestStreak, prev.currentStreak + 1)
+                  }));
+                }
+                return newSteps;
+              });
+              
+              setRecords(prev => ({
+                ...prev,
+                maxHits: Math.max(prev.maxHits, newHits),
+                maxSteps: Math.max(prev.maxSteps, newSteps)
+              }));
+              
+              return newHits;
+            });
+            playHitSound();
+            setStatus('Manual hit added! 🏓');
+            setTimeout(() => setStatus(isListening ? 'Listening...' : 'Stopped listening'), 1500);
+          }}
+        >
+          🏓 Test
+        </button>
+      </div>
+      
       <div className="status">
         <p className="status-text">
           {isListening && <span className="listening-indicator"></span>}
@@ -451,35 +504,6 @@ const SoundCounter = () => {
                 <span style={{color: 'rgba(255,255,255,0.7)', fontSize: '10px'}}>Loud</span>
               </div>
             </div>
-            <button
-              className="button button-secondary"
-              onClick={() => setDebugMode(!debugMode)}
-              style={{fontSize: '14px', padding: '8px 16px', marginTop: '5px'}}
-            >
-              {debugMode ? 'Hide Debug' : 'Show Debug'}
-            </button>
-            {debugMode && (
-              <div style={{marginTop: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.8)'}}>
-                <div>Current Volume: {currentVolume.toFixed(3)}</div>
-                <div>Threshold: {threshold.toFixed(3)}</div>
-                <div>Detection: {currentVolume > threshold ? '🟢 TRIGGERED' : '🔴 Waiting'}</div>
-                <div>Audio Context State: {audioContextRef.current?.state || 'Not created'}</div>
-                <div>Analyzer Connected: {analyserRef.current ? '✅' : '❌'}</div>
-                <div>Data Array Size: {dataArrayRef.current?.length || 0}</div>
-                <button
-                  className="button button-secondary"
-                  onClick={() => {
-                    if (audioContextRef.current?.state === 'suspended') {
-                      audioContextRef.current.resume();
-                      setStatus('Audio context resumed');
-                    }
-                  }}
-                  style={{fontSize: '10px', padding: '4px 8px', marginTop: '5px'}}
-                >
-                  Resume Audio Context
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -495,9 +519,51 @@ const SoundCounter = () => {
         </div>
       </div>
       
+      <div className="record-section">
+        <h3>📊 Records</h3>
+        <div className="record-item">
+          <span>Max Hits:</span>
+          <span>{records.maxHits}</span>
+        </div>
+        <div className="record-item">
+          <span>Max Steps:</span>
+          <span>{records.maxSteps}</span>
+        </div>
+        <div className="record-item">
+          <span>Current Streak:</span>
+          <span>{records.currentStreak}</span>
+        </div>
+        <div className="record-item">
+          <span>Best Streak:</span>
+          <span>{records.bestStreak}</span>
+        </div>
+        <button
+          className="button button-secondary"
+          onClick={clearRecords}
+          style={{marginTop: '15px', width: '100%'}}
+        >
+          Clear Records
+        </button>
+      </div>
+
+      {isListening && (
+        <div style={{marginTop: '15px', padding: '15px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px'}}>
+          <p style={{color: 'white', margin: '0 0 10px 0', fontSize: '14px'}}>
+            📢 Testing Instructions:
+          </p>
+          <ul style={{color: 'rgba(255,255,255,0.8)', fontSize: '12px', margin: 0, paddingLeft: '20px'}}>
+            <li>Clap your hands loudly</li>
+            <li>Tap the table with your finger</li>
+            <li>Say "Hello" loudly</li>
+            <li>Watch the volume bar change</li>
+          </ul>
+        </div>
+      )}
+      
+      {/* Audio Settings and Debug - Moved to Bottom */}
       <div className="controls">
         <div className="control-group">
-          <h3>Audio Settings</h3>
+          <h3>⚙️ Audio Settings</h3>
           <div className="input-group">
             <label>Sensitivity:</label>
             <input
@@ -533,104 +599,41 @@ const SoundCounter = () => {
               onChange={(e) => setAutoResetTime(parseInt(e.target.value))}
             />
           </div>
+          
+          {isListening && (
+            <div style={{marginTop: '15px'}}>
+              <button
+                className="button button-secondary"
+                onClick={() => setDebugMode(!debugMode)}
+                style={{fontSize: '12px', padding: '8px 16px', width: '100%'}}
+              >
+                {debugMode ? '🔼 Hide Debug' : '🔽 Show Debug'}
+              </button>
+              {debugMode && (
+                <div style={{marginTop: '10px', fontSize: '11px', color: 'rgba(255,255,255,0.8)', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px'}}>
+                  <div>Current Volume: {currentVolume.toFixed(3)}</div>
+                  <div>Threshold: {threshold.toFixed(3)}</div>
+                  <div>Detection: {currentVolume > threshold ? '🟢 TRIGGERED' : '🔴 Waiting'}</div>
+                  <div>Audio Context State: {audioContextRef.current?.state || 'Not created'}</div>
+                  <div>Analyzer Connected: {analyserRef.current ? '✅' : '❌'}</div>
+                  <div>Data Array Size: {dataArrayRef.current?.length || 0}</div>
+                  <button
+                    className="button button-secondary"
+                    onClick={() => {
+                      if (audioContextRef.current?.state === 'suspended') {
+                        audioContextRef.current.resume();
+                        setStatus('Audio context resumed');
+                      }
+                    }}
+                    style={{fontSize: '10px', padding: '4px 8px', marginTop: '5px', width: '100%'}}
+                  >
+                    Resume Audio Context
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </div>
-      
-      <div className="controls">
-        <button
-          className={`button ${isListening ? 'button-secondary' : 'button-primary'}`}
-          onClick={isListening ? stopListening : startListening}
-        >
-          {isListening ? 'Stop Listening' : 'Start Listening'}
-        </button>
-        
-        {isListening && (
-          <div style={{marginTop: '15px', padding: '15px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px'}}>
-            <p style={{color: 'white', margin: '0 0 10px 0', fontSize: '14px'}}>
-              📢 Testing Instructions:
-            </p>
-            <ul style={{color: 'rgba(255,255,255,0.8)', fontSize: '12px', margin: 0, paddingLeft: '20px'}}>
-              <li>Clap your hands loudly</li>
-              <li>Tap the table with your finger</li>
-              <li>Say "Hello" loudly</li>
-              <li>Watch the volume bar change</li>
-            </ul>
-            <p style={{color: 'white', margin: '10px 0 0 0', fontSize: '12px'}}>
-              If volume stays at 0.000, try clicking "Resume Audio Context" in debug mode.
-            </p>
-          </div>
-        )}
-        
-        <button
-          className="button button-success"
-          onClick={handleReset}
-        >
-          Reset Counters
-        </button>
-        
-        <button
-          className="button button-success"
-          onClick={() => {
-            // Manual hit for testing
-            setHits(prevHits => {
-              const newHits = prevHits + 1;
-              const newSteps = Math.floor(newHits / stepsPerHit);
-              
-              setSteps(prevSteps => {
-                if (newSteps > prevSteps) {
-                  playStepSound();
-                  setRecords(prev => ({
-                    ...prev,
-                    currentStreak: prev.currentStreak + 1,
-                    bestStreak: Math.max(prev.bestStreak, prev.currentStreak + 1)
-                  }));
-                }
-                return newSteps;
-              });
-              
-              setRecords(prev => ({
-                ...prev,
-                maxHits: Math.max(prev.maxHits, newHits),
-                maxSteps: Math.max(prev.maxSteps, newSteps)
-              }));
-              
-              return newHits;
-            });
-            playHitSound();
-            setStatus('Manual hit added! 🏓');
-            setTimeout(() => setStatus(isListening ? 'Listening...' : 'Stopped listening'), 1500);
-          }}
-          style={{marginTop: '10px'}}
-        >
-          Test Hit (Manual) 🏓
-        </button>
-      </div>
-      
-      <div className="record-section">
-        <h3>📊 Records</h3>
-        <div className="record-item">
-          <span>Max Hits:</span>
-          <span>{records.maxHits}</span>
-        </div>
-        <div className="record-item">
-          <span>Max Steps:</span>
-          <span>{records.maxSteps}</span>
-        </div>
-        <div className="record-item">
-          <span>Current Streak:</span>
-          <span>{records.currentStreak}</span>
-        </div>
-        <div className="record-item">
-          <span>Best Streak:</span>
-          <span>{records.bestStreak}</span>
-        </div>
-        <button
-          className="button button-secondary"
-          onClick={clearRecords}
-          style={{marginTop: '15px', width: '100%'}}
-        >
-          Clear Records
-        </button>
       </div>
     </div>
   );
